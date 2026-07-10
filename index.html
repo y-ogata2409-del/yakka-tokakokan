@@ -398,7 +398,7 @@ function buildFormHTML(data) {
     html += `<th style="width: 200px" scope="col">
       <div style="display:flex;align-items:center;gap:4px;">
         <input type="checkbox" id="yukou${l}" name="yukou${l}"${che}>
-        <input type="text" class="form-control form-control-sm" id="meisyou${l}" name="meisyou${l}" value="${escapeHtml(d.meisyou)}" onfocus="this.select();">
+        <input type="text" class="form-control form-control-sm" id="meisyou${l}" name="meisyou${l}" value="${escapeHtml(d.meisyou)}" title="${escapeHtml(d.meisyou)}" onfocus="this.select();">
         <button type="button" class="btn btn-sm btn-outline-secondary" style="padding:0 6px;line-height:1.6;" onclick="clearDrug(${l})" title="薬剤${l}の入力内容をクリア">✕</button>
       </div>
     </th>`;
@@ -589,6 +589,18 @@ function initFormBindings() {
       if (checkbox) {
         checkbox.addEventListener('change', calcBtn);
       }
+    }
+  }
+
+  // 薬品名は長いと入力欄で見切れることがあるため、
+  // title属性でホバー時に全文が見えるようにし、入力中も同期させる
+  for (let i = 1; i <= 5; i++) {
+    const meisyouEl = document.getElementById('meisyou' + i);
+    if (meisyouEl) {
+      meisyouEl.title = meisyouEl.value;
+      meisyouEl.addEventListener('input', () => {
+        meisyouEl.title = meisyouEl.value;
+      });
     }
   }
 
