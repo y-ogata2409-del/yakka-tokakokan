@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>等価交換</title>
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <style>
 .input-block {
@@ -358,6 +358,14 @@ function saveCurrentState(mokuhyou, siborikomi) {
 // ============================================================
 // フォームHTML生成（旧: getFormHTML相当。サーバー無しでクライアントで生成）
 // ============================================================
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function buildFormHTML(data) {
   let html = `
   <div class="eq-header">
@@ -373,6 +381,10 @@ function buildFormHTML(data) {
       <span>円以内</span>
     </div>
     <button type="button" id="setteibtn" onclick="setteiBtn()" class="eq-settei-btn">詳細設定 ▾</button>
+    <button type="button" onclick="resetAll()" class="eq-settei-btn" title="目標薬価・絞り込み・薬剤の設定をすべて初期値に戻します">🔄 初期値に戻す</button>
+    <button type="button" onclick="exportData()" class="eq-settei-btn" title="現在の設定をファイルに保存します">⬇ エクスポート</button>
+    <button type="button" onclick="document.getElementById('importFileInput').click()" class="eq-settei-btn" title="バックアップファイルから設定を読み込みます">⬆ インポート</button>
+    <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="importDataFile(this)">
   </div>
   `;
 
@@ -383,7 +395,13 @@ function buildFormHTML(data) {
   for (let l = 1; l <= 5; l++) {
     const d = data.drugs[l - 1];
     const che = d.yukou ? " checked" : "";
-    html += `<th style="width: 200px" scope="col"><input type="checkbox" id="yukou${l}" name="yukou${l}"${che}><input type="text" class="form-control" id="meisyou${l}" name="meisyou${l}" value="${d.meisyou}" onfocus="this.select();"></th>`;
+    html += `<th style="width: 200px" scope="col">
+      <div style="display:flex;align-items:center;gap:4px;">
+        <input type="checkbox" id="yukou${l}" name="yukou${l}"${che}>
+        <input type="text" class="form-control form-control-sm" id="meisyou${l}" name="meisyou${l}" value="${escapeHtml(d.meisyou)}" onfocus="this.select();">
+        <button type="button" class="btn btn-sm btn-outline-secondary" style="padding:0 6px;line-height:1.6;" onclick="clearDrug(${l})" title="薬剤${l}の入力内容をクリア">✕</button>
+      </div>
+    </th>`;
   }
 
   html += `</tr></thead><tbody>`;
@@ -527,51 +545,160 @@ function addWheelHandler(el, step, allowInfinity, colNo) {
   }, { passive: false });
 }
 
-addWheelHandler(document.getElementById('mokuhyou'), 0.1);
-addWheelHandler(document.getElementById('siborikomi'), 0.1);
-for (let i = 1; i <= 5; i++) {
-  addWheelHandler(document.getElementById('jogen' + i), 1, true, i);
-  addWheelHandler(document.getElementById('kagen' + i), 1, false, i);
-}
-
-document.getElementById('mokuhyou').addEventListener('input', (e) => calcBtn());
-document.getElementById('siborikomi').addEventListener('input', (e) => calcBtn());
-
-for (let k = 1; k <= 4; k++) {
-  let 対象="";
-  switch (k){
-    case 1:対象='yakka';break;
-    case 2:対象='josu';break;
-    case 3:対象='jogen';break;
-    case 4:対象='kagen';break;
-    default:
-  }
+// フォーム再描画のたびに呼び出せるよう、イベントの紐付けを関数化しておく
+// （初回描画時／リセット時／インポート時のいずれでも同じ処理を使い回す）
+function initFormBindings() {
+  addWheelHandler(document.getElementById('mokuhyou'), 0.1);
+  addWheelHandler(document.getElementById('siborikomi'), 0.1);
   for (let i = 1; i <= 5; i++) {
-    const henkouId = 対象 + i;
-    const henkou = document.getElementById(henkouId);
-    if (henkou) {
-      henkou.addEventListener('input', calcBtn);
+    addWheelHandler(document.getElementById('jogen' + i), 1, true, i);
+    addWheelHandler(document.getElementById('kagen' + i), 1, false, i);
+  }
+
+  document.getElementById('mokuhyou').addEventListener('input', (e) => calcBtn());
+  document.getElementById('siborikomi').addEventListener('input', (e) => calcBtn());
+
+  for (let k = 1; k <= 4; k++) {
+    let 対象="";
+    switch (k){
+      case 1:対象='yakka';break;
+      case 2:対象='josu';break;
+      case 3:対象='jogen';break;
+      case 4:対象='kagen';break;
+      default:
+    }
+    for (let i = 1; i <= 5; i++) {
+      const henkouId = 対象 + i;
+      const henkou = document.getElementById(henkouId);
+      if (henkou) {
+        henkou.addEventListener('input', calcBtn);
+      }
     }
   }
-}
 
-for (let k = 1; k <= 2; k++) {
-  let 対象チェックボックス="";
-  switch (k){
-    case 1:対象チェックボックス='yukou';break;
-    case 2:対象チェックボックス='hasuu';break;
-    default:
-  }
-  for (let i = 1; i <= 5; i++) {
-    const checkboxId = 対象チェックボックス + i;
-    const checkbox = document.getElementById(checkboxId);
-    if (checkbox) {
-      checkbox.addEventListener('change', calcBtn);
+  for (let k = 1; k <= 2; k++) {
+    let 対象チェックボックス="";
+    switch (k){
+      case 1:対象チェックボックス='yukou';break;
+      case 2:対象チェックボックス='hasuu';break;
+      default:
+    }
+    for (let i = 1; i <= 5; i++) {
+      const checkboxId = 対象チェックボックス + i;
+      const checkbox = document.getElementById(checkboxId);
+      if (checkbox) {
+        checkbox.addEventListener('change', calcBtn);
+      }
     }
   }
+
+  // 詳細設定行は初期状態では非表示にする
+  const settei1 = document.getElementById('settei1');
+  if (settei1 && !settei1.classList.contains('hidden')) {
+    setteiBtn();
+  }
 }
 
-setteiBtn()
+initFormBindings();
+
+// フォームを指定データで再描画し、イベントを再設定する
+// （全体リセット・インポート時に使用）
+function renderAndWire(data) {
+  document.getElementById('formArea').innerHTML = buildFormHTML(data);
+  initFormBindings();
+  calcBtn();
+}
+
+// ▼ 薬剤単位のクリア ▼
+function clearDrug(l) {
+  if (!confirm(`薬剤${l}の入力内容（名称・薬価・錠数・端数禁止・上限/下限）をクリアします。よろしいですか？`)) return;
+  document.getElementById('yukou' + l).checked = false;
+  document.getElementById('meisyou' + l).value = '';
+  document.getElementById('yakka' + l).value = '';
+  document.getElementById('josu' + l).value = '';
+  document.getElementById('hasuu' + l).checked = false;
+  const jEl = document.getElementById('jogen' + l);
+  jEl.value = '';
+  jEl.placeholder = '∞';
+  document.getElementById('kagen' + l).value = '';
+  calcBtn();
+}
+
+// ▼ 全体を初期値に戻す ▼
+function resetAll() {
+  if (!confirm('目標薬価・絞り込み・薬剤の設定をすべて初期値に戻します。よろしいですか？')) return;
+  const data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  renderAndWire(data);
+  saveData(data);
+}
+
+// ▼ 現在の入力内容をJSONファイルとして書き出す ▼
+function exportData() {
+  const current = { mokuhyou: 0, siborikomi: 0, drugs: [] };
+  current.mokuhyou = document.getElementById('mokuhyou').value !== "" ? Number(document.getElementById('mokuhyou').value) : 0;
+  current.siborikomi = document.getElementById('siborikomi').value !== "" ? Number(document.getElementById('siborikomi').value) : 0;
+  for (let i = 1; i <= 5; i++) {
+    current.drugs.push({
+      yukou: document.getElementById('yukou' + i).checked,
+      meisyou: document.getElementById('meisyou' + i).value,
+      yakka: document.getElementById('yakka' + i).value !== "" ? Number(document.getElementById('yakka' + i).value) : 0,
+      josu: document.getElementById('josu' + i).value !== "" ? Number(document.getElementById('josu' + i).value) : 0,
+      hasuu: document.getElementById('hasuu' + i).checked,
+      jogen: document.getElementById('jogen' + i).value !== "" ? Number(document.getElementById('jogen' + i).value) : null,
+      kagen: document.getElementById('kagen' + i).value !== "" ? Number(document.getElementById('kagen' + i).value) : null
+    });
+  }
+  const blob = new Blob([JSON.stringify(current, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const ymd = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  a.href = url;
+  a.download = `toukakoukan_backup_${ymd}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ▼ JSONファイルから設定を読み込む ▼
+function importDataFile(fileInput) {
+  const file = fileInput.files && fileInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed || !Array.isArray(parsed.drugs) || parsed.drugs.length !== 5) {
+        alert('ファイルの形式が正しくありません。');
+        return;
+      }
+      // 型を軽く補正
+      const data = {
+        mokuhyou: Number(parsed.mokuhyou) || 0,
+        siborikomi: Number(parsed.siborikomi) || 0,
+        drugs: parsed.drugs.map(d => ({
+          yukou: !!d.yukou,
+          meisyou: d.meisyou != null ? String(d.meisyou) : '',
+          yakka: Number(d.yakka) || 0,
+          josu: Number(d.josu) || 1,
+          hasuu: !!d.hasuu,
+          jogen: (d.jogen === null || d.jogen === undefined || d.jogen === "") ? null : Number(d.jogen),
+          kagen: (d.kagen === null || d.kagen === undefined || d.kagen === "") ? null : Number(d.kagen)
+        }))
+      };
+      renderAndWire(data);
+      saveData(data);
+      alert('設定を読み込みました。');
+    } catch (err) {
+      alert('ファイルの読み込みに失敗しました。JSON形式のバックアップファイルを選択してください。');
+    } finally {
+      fileInput.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
 
 //▼設定部分の表示・非表示▼
 function setteiBtn(){
