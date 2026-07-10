@@ -1,571 +1,1079 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <title>等価交換</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    
-    <style>
-      .input-block {
-        display: flex;
-        flex-direction: column;
-      }
-      .select-block {
-        margin-bottom: 16px;
-      }
-      select, label {
-        height: 52px;
-        font-size: 14px;
-      }
-      .vertical-middle{
-        background: yellow; 
-        display: table-cell;
-        vertical-align: middle; 
-      }
-      input[type=checkbox] {
-        transform: scale(1.5);
-      }
-      .hidden {
-        display: none;
-      }
-      .box-019 {
-          position: relative;
-          margin-top: 1em;
-          padding: 1.8em 1.5em 1em 1.5em;
-          border: 2px solid #25d061;
-      }
-      .box-019 > div {
-          position: absolute;
-          top: -1.15em;
-          left: -.5em;
-          padding: .4em 1.4em;
-          border-radius: 25px;
-          background-color: #25d061;
-          color: #fff;
-          font-size: .9em;
-      }
-      .jouken-tag {
-        display: inline-block;
-        padding: 1px 8px;
-        border-radius: 4px;
-        font-size: 13px;
-        margin: 0 3px;
-        cursor: pointer;
-        text-decoration: underline dotted;
-      }
-      .jouken-tag-normal {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffc107;
-        font-weight: 500;
-      }
-      .jouken-tag-danger {
-        background: #ff4d4d;
-        color: #fff;
-        border: 1px solid #c0392b;
-        font-weight: 500;
-        animation: tagPulse 1s ease-in-out infinite;
-      }
-      @keyframes tagPulse {
-        0%,100% { box-shadow: 0 0 0 0 rgba(255,77,77,.6); }
-        50%      { box-shadow: 0 0 0 6px rgba(255,77,77,0); }
-      }
-      .jouken-warn-box {
-        margin-top: 6px;
-        padding: 8px 12px;
-        background: #fff8e1;
-        border-left: 3px solid #ffc107;
-        border-radius: 4px;
-        font-size: 13px;
-        color: #856404;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container" style="min-width: 600px;">
-      <div class="my-3 p-3 bg-light border rounded">
-        <div class="row align-items-center g-3">
-          <div class="col-auto">
-            <label for="mokuhyou" class="form-label mb-0 fw-bold">目標薬価:</label>
-            <input type="number" class="form-control d-inline-block text-center" style="width:150px;" step="0.1" min="0" id="mokuhyou" onfocus="this.select();">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>等価交換</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<style>
+.input-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.select-block {
+  margin-bottom: 16px;
+}
+
+select, label {
+  height: 52px;
+  font-size: 14px;
+}
+
+.vertical-middle{
+  background: yellow;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
+}
+
+.hidden {
+  display: none;
+}
+
+.box-019 {
+    position: relative;
+    margin-top: 1em;
+    padding: 1.8em 1.5em 1em 1.5em;
+    border: 2px solid #25d061;
+}
+
+.box-019 > div {
+    position: absolute;
+    top: -1.15em;
+    left: -.5em;
+    padding: .4em 1.4em;
+    border-radius: 25px;
+    background-color: #25d061;
+    color: #fff;
+    font-size: .9em;
+}
+
+.box-019 > div::before {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 8px;
+    background-color: #25d061;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    content: '';
+}
+
+.box-019 p {
+    margin: 0;
+    background-color: #f3fef1;
+}
+
+.guide{padding:.5rem 0;font-size:16px;color:#333}
+.guide-section{margin-bottom:1.5rem}
+.guide-section-label{font-size:16px;font-weight:500;letter-spacing:.06em;color:#333;text-transform:uppercase;margin-bottom:10px}
+.guide-steps{display:flex;flex-direction:column;gap:8px}
+.guide-step{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #ddd;color:#333}
+.guide-step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#dbeeff;color:#185fa5;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center}
+.guide-step-text{font-size:15px;line-height:1.6;color:#333}
+.guide-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.guide-card{padding:12px 14px;background:#fff;border-radius:8px;border:1px solid #c6e8d4}
+.guide-card-icon{font-size:16px;margin-bottom:6px}
+.guide-card-title{font-size:15px;font-weight:500;margin-bottom:4px;color:#333}
+.guide-card-body{font-size:14px;color:#333;line-height:1.6}
+.guide-tip{display:flex;gap:10px;padding:10px 14px;border-left:3px solid #378add;background:#e6f1fb;border-radius:0 8px 8px 0;margin-bottom:8px}
+.guide-tip-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.guide-tip-text{font-size:14px;color:#185fa5;line-height:1.6}
+.guide-result-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #ddd;margin-bottom:6px}
+.guide-result-label{font-size:13px;font-weight:500;color:#222;width:64px;flex-shrink:0;padding-top:1px}
+.guide-result-body{font-size:14px;color:#222;line-height:1.7}
+.guide-zero-badge{display:inline-block;background:#ffe066;color:#7a5c00;font-size:15px;font-weight:500;padding:0 8px;border-radius:4px;border:1px solid #d4a800;margin-right:6px}
+.guide-blue-text{color:#185fa5;font-weight:500;font-size:15px;margin-right:6px}
+.guide-divider{height:1px;background:#ddd;margin:1.5rem 0}
+.guide-wheel-demo{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #ddd;margin-bottom:6px}
+.guide-wheel-icon{width:28px;height:36px;border:1.5px solid #999;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0}
+.guide-wheel-scroll{width:6px;height:10px;border:1.5px solid #999;border-radius:3px;animation:guide-scroll 1.5s ease-in-out infinite}
+@keyframes guide-scroll{0%,100%{transform:translateY(-2px);opacity:.4}50%{transform:translateY(2px);opacity:1}}
+.guide-arrow-up{width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:4px solid #999;opacity:.7}
+.guide-arrow-dn{width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid #999;opacity:.7}
+.guide-wheel-label{font-size:14px;color:#333;line-height:1.7}
+.guide-wheel-label strong{color:#333;font-weight:500}
+.guide-priority{display:flex;align-items:center;gap:6px;font-size:13px;color:#222;margin-top:10px;flex-wrap:wrap}
+.guide-pri-item{padding:3px 10px;background:#fff;border-radius:8px;border:1px solid #bbb;color:#222;font-size:13px}
+.guide-pri-arrow{color:#333;font-size:12px}
+.guide-calc-note{font-size:14px;color:#333;line-height:1.8;padding:12px 14px;background:#fff;border-radius:8px;border:1px solid #c6e8d4}
+.box-019{border:1px solid #b8dfc8 !important;background-color:#eef8f2 !important;border-radius:8px !important;padding:1.2em 1.5em 1em 1.5em !important;margin-top:0.5em !important}
+.box-019>div{position:static !important;display:block !important;background-color:#a8d8bc !important;color:#2a6645 !important;border:none !important;border-radius:6px !important;font-size:15px !important;font-weight:500 !important;letter-spacing:.06em !important;padding:6px 14px !important;margin-bottom:16px !important;width:auto !important;display:inline-block !important}
+.box-019>div::before{display:none !important}
+.box-019>div::after{display:none !important}
+.box-019 p{background-color:#fff !important;color:#333 !important;margin:0 !important}
+
+.eq-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#e8f5ee 0%,#f0faf4 100%);border:1px solid #c6e8d4;border-radius:10px;padding:8px 14px;margin-bottom:10px}
+.eq-title{font-size:18px;font-weight:700;color:#2a6645;white-space:nowrap;margin-right:2px}
+.eq-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #c6e8d4;border-radius:20px;padding:4px 12px}
+.eq-chip label{font-size:11px;color:#888;white-space:nowrap;margin:0}
+.eq-chip input{border:none;font-weight:600;text-align:center;color:#2a6645;background:transparent;outline:none;-moz-appearance:textfield}
+.eq-chip input::-webkit-outer-spin-button,.eq-chip input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.eq-chip span{font-size:13px;color:#666;white-space:nowrap}
+.eq-chip-mokuhyou input{width:110px;font-size:22px}
+.eq-chip-sibori input{width:45px;font-size:15px}
+.eq-settei-btn{padding:5px 16px;border:1px solid #2a6645;border-radius:20px;background:#fff;color:#2a6645;font-size:15px;cursor:pointer;white-space:nowrap}
+
+.jouken-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin: 0 3px;
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+.jouken-tag-normal {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+  font-weight: 500;
+}
+.jouken-tag-danger {
+  background: #ff4d4d;
+  color: #fff;
+  border: 1px solid #c0392b;
+  font-weight: 500;
+  animation: tagPulse 1s ease-in-out infinite;
+}
+@keyframes tagPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,77,77,.6); }
+  50%      { box-shadow: 0 0 0 6px rgba(255,77,77,0); }
+}
+.jouken-warn-box {
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: #fff8e1;
+  border-left: 3px solid #ffc107;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: #856404;
+}
+.input-highlight {
+  outline: 2px solid #ff4d4d !important;
+  background: #fff0f0 !important;
+  animation: inputPulse 1s ease-in-out 3;
+}
+@keyframes inputPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,77,77,.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(255,77,77,0); }
+}
+.row-flash {
+  animation: rowFlash 0.8s ease-out forwards;
+}
+@keyframes rowFlash {
+  0%   { background-color: #b8eaff; }
+  100% { background-color: transparent; }
+}
+</style>
+</head>
+<body>
+  <div class="container" style="min-width: 600px; max-width: 1000px;">
+
+    <div id="formArea"></div>
+
+    <p class="scroll_area"></p>
+
+    <div class="box-019">
+        <div>How to use</div>
+
+        <div class="guide">
+
+          <div class="guide-section">
+            <div class="guide-section-label">基本の流れ</div>
+            <div class="guide-steps">
+              <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">目標薬価を入力する</div></div>
+              <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">必要に応じて薬剤名の上のチェックボックスをオン/オフする（最小1・最大5種類）</div></div>
+              <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">第一〜第五候補の結果を確認する</div></div>
+            </div>
           </div>
-          <div class="col-auto">
-            <label for="siborikomi" class="form-label mb-0 fw-bold">絞り込み:</label>
-            <input type="number" class="form-control d-inline-block text-center" style="width:80px;" step="0.1" min="0" id="siborikomi" onfocus="this.select();"> <span class="fw-bold">円以内</span>
+
+          <div class="guide-tip">
+            <div class="guide-tip-icon">💡</div>
+            <div class="guide-tip-text">計算ボタンを押さなくても、目標薬価・絞り込み・チェック・薬価・錠数・端数禁止・上下限値を変更するたびに自動で再計算されます。</div>
           </div>
-          <div class="col-auto ms-auto">
-            <button type="button" class="btn btn-primary" id="calcbtn" onclick="実行ボタン();">計算実行</button>
-            <button type="button" class="btn btn-secondary ms-2" id="clearbtn" onclick="クリアボタン();">クリア</button>
+
+          <div class="guide-divider"></div>
+
+          <div class="guide-section">
+            <div class="guide-section-label">🖱 ホイール操作</div>
+            <div class="guide-wheel-demo">
+              <div class="guide-wheel-icon">
+                <div class="guide-arrow-up"></div>
+                <div class="guide-wheel-scroll"></div>
+                <div class="guide-arrow-dn"></div>
+              </div>
+              <div class="guide-wheel-label">
+                入力欄にマウスを乗せてスクロールすると値を変更できます。<br>
+                目標薬価・絞り込み → 0.1ずつ変化<br>
+                上限値・下限値 → 段階的に変化（9以下: 1ずつ／10〜299: 10ずつ／300以上: 100ずつ）<br>
+                上限値が∞の状態で下にスクロールすると、第一候補の個数を元に自動でセットされます。
+              </div>
+            </div>
           </div>
+
+          <div class="guide-divider"></div>
+
+          <div class="guide-section">
+            <div class="guide-section-label">結果の見方</div>
+
+            <div class="guide-result-row">
+              <div class="guide-result-label">目標との差</div>
+              <div class="guide-result-body">
+                目標薬価と計算結果の差を数値で表示します。<br>
+                <span class="guide-zero-badge">0</span>のときは目標薬価とぴったり一致。数字が大きいほど目標との差が大きくなります。
+              </div>
+            </div>
+
+            <div class="guide-result-row">
+              <div class="guide-result-label">端数ゼロ</div>
+              <div class="guide-result-body">
+                その組み合わせの中で、1シート錠数単位でぴったり準備できる薬剤が何種類あるかを表します。<br>
+                例: <span class="guide-blue-text">3</span>なら、3種類の薬剤がシートを切らずに準備できる組み合わせ。0なら端数が出る薬剤のみ。
+              </div>
+            </div>
+
+            <div class="guide-priority">
+              <span style="font-size:11px;color:#333">表示優先順位：</span>
+              <span class="guide-pri-item">① 目標との差が小さい</span>
+              <span class="guide-pri-arrow">→</span>
+              <span class="guide-pri-item">② 端数ゼロの種類が多い</span>
+              <span class="guide-pri-arrow">→</span>
+              <span class="guide-pri-item">③ より左の薬剤を優先</span>
+            </div>
+          </div>
+
+          <div class="guide-divider"></div>
+
+          <div class="guide-section">
+            <div class="guide-section-label">各設定の説明</div>
+            <div class="guide-cards">
+              <div class="guide-card">
+                <div class="guide-card-icon">💊</div>
+                <div class="guide-card-title">薬品名・薬価</div>
+                <div class="guide-card-body">等価交換の候補とする薬剤を入力してください。フリー入力です。薬価改定時は手動で修正してください。</div>
+              </div>
+              <div class="guide-card">
+                <div class="guide-card-icon">📋</div>
+                <div class="guide-card-title">1シート錠数</div>
+                <div class="guide-card-body">1シートあたりの錠数を入力。例: センノシド→10、リパクレオン→12。表示優先順位に影響しますが、計算結果自体には影響しません。</div>
+              </div>
+              <div class="guide-card">
+                <div class="guide-card-icon">✂️</div>
+                <div class="guide-card-title">端数禁止</div>
+                <div class="guide-card-body">シート単位以外の個数を結果から除外します。ハサミで切りたくない薬剤に設定してください。</div>
+              </div>
+              <div class="guide-card">
+                <div class="guide-card-icon">🔢</div>
+                <div class="guide-card-title">上限値・下限値</div>
+                <div class="guide-card-body">薬剤ごとに使用個数の上限・下限を設定できます。条件に合わない組み合わせは結果から除外されます。</div>
+              </div>
+              <div class="guide-card">
+                <div class="guide-card-icon">🎯</div>
+                <div class="guide-card-title">絞り込み</div>
+                <div class="guide-card-body">目標薬価との許容差を設定。0にするとぴったり一致した結果のみ表示されます。</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-divider"></div>
+
+          <div class="guide-section">
+            <div class="guide-section-label">⚡ 計算方式について</div>
+            <div class="guide-calc-note">
+              原則として全組み合わせを総当たりで計算し、条件に合う結果をすべて正確に抽出しています。<br><br>
+              ただし、薬価が小さい・種類が多い・目標薬価が大きいほど組み合わせ数が膨大になるため（いわゆる両替問題）、一定の基準を超えた場合は<strong>探索範囲を事前に絞り込んでから総当たりを行う</strong>方式に切り替えます。この場合も計算自体は正確ですが、探索範囲の絞り込みにより特定の薬剤の個数が多めになる傾向があります（画面に「概算を適用」と表示されます）。<br><br>
+              入力内容はこのブラウザ内（localStorage）にのみ保存され、次回アクセス時に前回の設定を復元します。他の端末やユーザーとは共有されません。
+            </div>
+          </div>
+
         </div>
-      </div>
-
-      <table class="table table-bordered align-middle text-center" style="font-size: 14px;">
-        <thead class="table-dark">
-          <tr>
-            <th style="width: 5%;">選択</th>
-            <th style="width: 35%;">薬剤名</th>
-            <th style="width: 12%;">薬価</th>
-            <th style="width: 10%;">シート枚数</th>
-            <th style="width: 12%;">端数禁止</th>
-            <th style="width: 13%;">下限値</th>
-            <th style="width: 13%;">上限値</th>
-          </tr>
-        </thead>
-        <tbody id="yakuzaiTableBody">
-          <script>
-            for(let i=1; i<=5; i++) {
-              document.write(`
-                <tr>
-                  <td><input type="checkbox" id="check${i}"></td>
-                  <td><input type="text" class="form-control form-control-sm" id="name${i}"></td>
-                  <td><input type="number" class="form-control form-control-sm text-end" step="0.1" min="0" id="yakka${i}" onfocus="this.select();"></td>
-                  <td><input type="number" class="form-control form-control-sm text-center" min="1" id="josu${i}" onfocus="this.select();"></td>
-                  <td><input type="checkbox" id="hasu${i}"></td>
-                  <td><input type="number" class="form-control form-control-sm text-center" min="0" id="kagen${i}" onfocus="this.select();"></td>
-                  <td><input type="number" class="form-control form-control-sm text-center" min="0" id="jogen${i}" onfocus="this.select();"></td>
-                </tr>
-              `);
-            }
-          </script>
-        </tbody>
-      </table>
-
-      <div id="jouken_container"></div>
-
-      <div id="result_area" class="mt-4"></div>
     </div>
+  </div>
 
-    <script>
-      // ご指定いただいた初期デフォルトデータ
-      const DEFAULT_DATA = {
-        mokuhyou: 543.2,
-        siborikomi: 0.4,
-        yakuzai: [
-          { check: true,  name: "センノシド錠12mg", yakka: 5.5, josu: 10, hasu: false, jogen: "", kagen: "" },
-          { check: true,  name: "ランソプラゾール15㎎", yakka: 10.8, josu: 10, hasu: false, jogen: "", kagen: "" },
-          { check: true,  name: "メコバラミン錠 500μg", yakka: 6.1, josu: 10, hasu: false, jogen: "", kagen: "" },
-          { check: true,  name: "シーピー配合顆粒", yakka: 6.9, josu: 3, hasu: false, jogen: "", kagen: "" },
-          { check: false, name: "タケキャブ10㎎", yakka: 91.6, josu: 10, hasu: false, jogen: "", kagen: "" }
-        ]
-      };
+<script>
+// ============================================================
+// データ定義（旧: スプレッドシート「基本」「ログ」シート相当）
+// すべてこのブラウザの localStorage 内だけで完結する
+// ============================================================
+const STORAGE_KEY = 'toukakoukan_data_v1';
 
-      // ページ読み込み完了時：データの復元
-      window.addEventListener('DOMContentLoaded', () => {
-        let savedData = localStorage.getItem('tokakokan_data');
-        if (!savedData) {
-          savedData = DEFAULT_DATA;
-          localStorage.setItem('tokakokan_data', JSON.stringify(savedData));
-        } else {
-          savedData = JSON.parse(savedData);
-        }
-        reflectDataToForm(savedData);
-      });
+const DEFAULT_DATA = {
+  mokuhyou: 543.2,
+  siborikomi: 0.4,
+  drugs: [
+    { yukou: true,  meisyou: 'センノシド錠12mg',      yakka: 5.5,  josu: 10, hasuu: false, jogen: null, kagen: null },
+    { yukou: true,  meisyou: 'ランソプラゾール15㎎',    yakka: 10.8, josu: 10, hasuu: false, jogen: null, kagen: null },
+    { yukou: true,  meisyou: 'メコバラミン錠 500μg',   yakka: 6.1,  josu: 10, hasuu: false, jogen: null, kagen: null },
+    { yukou: true,  meisyou: 'シーピー配合顆粒',        yakka: 6.9,  josu: 3,  hasuu: false, jogen: null, kagen: null },
+    { yukou: false, meisyou: 'タケキャブ10㎎',          yakka: 91.6, josu: 10, hasuu: false, jogen: null, kagen: null }
+  ]
+};
 
-      // フォームに入元データを反映
-      function reflectDataToForm(data) {
-        document.getElementById('mokuhyou').value = data.mokuhyou;
-        document.getElementById('siborikomi').value = data.siborikomi;
-        for (let i = 1; i <= 5; i++) {
-          const item = data.yakuzai[i - 1];
-          if (item) {
-            document.getElementById(`check${i}`).checked = item.check;
-            document.getElementById(`name${i}`).value = item.name;
-            document.getElementById(`yakka${i}`).value = item.yakka;
-            document.getElementById(`josu${i}`).value = item.josu;
-            document.getElementById(`hasu${i}`).checked = item.hasu;
-            document.getElementById(`kagen${i}`).value = item.kagen;
-            document.getElementById(`jogen${i}`).value = item.jogen;
-          }
-        }
-      }
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.drugs) || parsed.drugs.length !== 5) {
+      return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+    return parsed;
+  } catch (e) {
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+}
 
-      // 現在の画面の入力状態をlocalStorageに永続保存する
-      function saveCurrentData() {
-        const currentData = {
-          mokuhyou: parseFloat(document.getElementById('mokuhyou').value) || 0,
-          siborikomi: parseFloat(document.getElementById('siborikomi').value) || 0,
-          yakuzai: []
+function saveData(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error('保存に失敗しました', e);
+  }
+}
+
+function saveCurrentState(mokuhyou, siborikomi) {
+  const data = { mokuhyou: mokuhyou, siborikomi: siborikomi, drugs: [] };
+  for (let i = 1; i <= 5; i++) {
+    data.drugs.push({
+      yukou: document.getElementById('yukou' + i).checked,
+      meisyou: document.getElementById('meisyou' + i).value,
+      yakka: Number(document.getElementById('yakka' + i).value),
+      josu: Number(document.getElementById('josu' + i).value),
+      hasuu: document.getElementById('hasuu' + i).checked,
+      jogen: document.getElementById('jogen' + i).value !== "" ? Number(document.getElementById('jogen' + i).value) : null,
+      kagen: document.getElementById('kagen' + i).value !== "" ? Number(document.getElementById('kagen' + i).value) : null
+    });
+  }
+  saveData(data);
+}
+
+// ============================================================
+// フォームHTML生成（旧: getFormHTML相当。サーバー無しでクライアントで生成）
+// ============================================================
+function buildFormHTML(data) {
+  let html = `
+  <div class="eq-header">
+    <div class="eq-title">⚖️ 等価交換</div>
+    <div class="eq-chip eq-chip-mokuhyou">
+      <label>目標薬価</label>
+      <input type="number" step="0.1" min="0" id="mokuhyou" value="${data.mokuhyou}" placeholder="0" onfocus="this.select();">
+      <span>円</span>
+    </div>
+    <div class="eq-chip eq-chip-sibori">
+      <label>絞り込み</label>
+      <input type="number" step="0.1" min="0" id="siborikomi" value="${data.siborikomi}" placeholder="0" onfocus="this.select();">
+      <span>円以内</span>
+    </div>
+    <button type="button" id="setteibtn" onclick="setteiBtn()" class="eq-settei-btn">詳細設定 ▾</button>
+  </div>
+  `;
+
+  html += `<table class="table table-striped">`;
+
+  html += `<thead><tr style="text-align: center;" class="table-danger"><th style="width: 120px" class="align-middle"; scope="col"><button type="button" onclick="calcBtn()" class="btn btn-primary">計算</button></th><th style="width: 140px" class="align-middle"; scope="col"><span style="font-weight: bold;";>目標との差</span></th><th style="width: 110px" class="align-middle"; scope="col"><span style="font-weight: bold; color: blue";>端数ゼロ</span></th>`;
+
+  for (let l = 1; l <= 5; l++) {
+    const d = data.drugs[l - 1];
+    const che = d.yukou ? " checked" : "";
+    html += `<th style="width: 200px" scope="col"><input type="checkbox" id="yukou${l}" name="yukou${l}"${che}><input type="text" class="form-control" id="meisyou${l}" name="meisyou${l}" value="${d.meisyou}" onfocus="this.select();"></th>`;
+  }
+
+  html += `</tr></thead><tbody>`;
+
+  html += `<tr style="text-align: center;" class="table-danger"><td class="align-middle">薬価</td><td></td><td></td>`;
+  for (let l = 1; l <= 5; l++) {
+    const d = data.drugs[l - 1];
+    html += `<td><input type="number" step="0.1" min="0" class="form-control" style="text-align: center" id="yakka${l}" name="yakka${l}" value="${d.yakka}" onfocus="this.select();"></td>`;
+  }
+  html += `</tr>`;
+
+  html += `<tr id="settei1" style="text-align: center;" bgcolor="#ebffee"><td class="align-middle">1ｼｰﾄ錠数</td><td></td><td></td>`;
+  for (let l = 1; l <= 5; l++) {
+    const d = data.drugs[l - 1];
+    html += `<td><input type="number" min="1" class="form-control" style="text-align: center" id="josu${l}" name="josu${l}" value="${d.josu}" onfocus="this.select();"></td>`;
+  }
+  html += `</tr>`;
+
+  html += `<tr id="settei2" style="text-align: center;" bgcolor="#ebffee"><td class="align-middle"><span style=" color: red";>端数禁止</span></td><td></td><td></td>`;
+  for (let l = 1; l <= 5; l++) {
+    const d = data.drugs[l - 1];
+    const che = d.hasuu ? " checked" : "";
+    html += `<td class="align-middle"><input type="checkbox" id="hasuu${l}" name="hasuu${l}"${che}></td>`;
+  }
+  html += `</tr>`;
+
+  html += `<tr id="settei3" style="text-align: center;" bgcolor="#ebffee"><td class="align-middle">上限値</td><td></td><td></td>`;
+  for (let l = 1; l <= 5; l++) {
+    const d = data.drugs[l - 1];
+    const val = (d.jogen === null || d.jogen === undefined) ? '' : d.jogen;
+    html += `<td><input type="number" min="0" class="form-control" style="text-align: center" id="jogen${l}" name="jogen${l}" value="${val}" placeholder="∞" onfocus="this.select();"></td>`;
+  }
+  html += `</tr>`;
+
+  html += `<tr id="settei4" style="text-align: center;" bgcolor="#ebffee"><td class="align-middle">下限値</td><td></td><td></td>`;
+  for (let l = 1; l <= 5; l++) {
+    const d = data.drugs[l - 1];
+    const val = (d.kagen === null || d.kagen === undefined) ? '' : d.kagen;
+    html += `<td><input type="number" min="0" class="form-control" style="text-align: center" id="kagen${l}" name="kagen${l}" value="${val}" onfocus="this.select();"></td>`;
+  }
+  html += `</tr>`;
+
+  for (let rank = 1; rank <= 5; rank++) {
+    html += `<tr style="text-align: center;" id="kandidate_row_${rank}"><td>${['候補🥇','候補🥈','候補🥉','候補4️⃣','候補5️⃣'][rank-1]}</td><td><span id="mokuhyousa_${rank}"></span></td><td><span id="hasuuzero_${rank}"></span></td>`;
+    for (let l = 1; l <= 5; l++) {
+      html += `<td><span id="kekka${rank}_${l}"></span></td>`;
+    }
+    html += `</tr>`;
+  }
+
+  html += `</tbody></table>`;
+  html += `<span id="yukousuu" style=" color: red";></span> <span id="sousuu"></span>`;
+  html += `<p id="siborikomijouken"></p>`;
+
+  return html;
+}
+
+// 初期描画
+document.getElementById('formArea').innerHTML = buildFormHTML(loadData());
+
+// ============================================================
+// 以下、計算・UI操作ロジック（旧 js.html を全面移植）
+// google.script.run によるサーバー保存は saveCurrentState() による
+// localStorage 保存に置き換えている
+// ============================================================
+
+// ▼ ホイール操作 ▼
+
+function getStep(val) {
+  if (val < 10) return 1;
+  if (val < 300) return 10;
+  return 100;
+}
+
+function floorToStep(val) {
+  const step = getStep(val);
+  return Math.floor(val / step) * step;
+}
+
+function getFirstCandidateValue(colNo) {
+  const el = document.getElementById('kekka1_' + colNo);
+  if (!el || el.innerHTML === '') return null;
+  const v = parseInt(el.innerHTML);
+  return isNaN(v) ? null : v;
+}
+
+function addWheelHandler(el, step, allowInfinity, colNo) {
+  if (!el) return;
+  el.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const scrollUp = e.deltaY < 0;
+
+    if (allowInfinity && el.value === "") {
+      if (scrollUp) {
+        el.value = 0;
+        el.placeholder = "";
+        el.dispatchEvent(new Event('input'));
+      } else {
+        const setVal = (v) => {
+          const floored = floorToStep(v);
+          el.value = Math.max(0, floored);
+          el.placeholder = "";
+          el.dispatchEvent(new Event('input'));
         };
-        for (let i = 1; i <= 5; i++) {
-          currentData.yakuzai.push({
-            check: document.getElementById(`check${i}`).checked,
-            name: document.getElementById(`name${i}`).value,
-            yakka: parseFloat(document.getElementById(`yakka${i}`).value) || 0,
-            josu: parseInt(document.getElementById(`josu${i}`).value) || 0,
-            hasu: document.getElementById(`hasu${i}`).checked,
-            kagen: document.getElementById(`kagen${i}`).value,
-            jogen: document.getElementById(`jogen${i}`).value
-          });
-        }
-        localStorage.setItem('tokakokan_data', JSON.stringify(currentData));
-      }
-
-      // 実行ボタンを押した時の処理
-      function 実行ボタン() {
-        saveCurrentData(); // 計算前に現在の入力を自動保存
-
-        const mokuhyou = parseFloat(document.getElementById('mokuhyou').value) || 0;
-        const siborikomi = parseFloat(document.getElementById('siborikomi').value) || 0;
-
-        // 計算ロジックに渡すデータ配列のビルド
-        let inputList = [];
-        for (let i = 1; i <= 5; i++) {
-          if (document.getElementById(`check${i}`).checked) {
-            let name = document.getElementById(`name${i}`).value || `薬剤${i}`;
-            let yakka = parseFloat(document.getElementById(`yakka${i}`).value) || 0;
-            let josu = parseInt(document.getElementById(`josu${i}`).value) || 1;
-            let hasu = document.getElementById(`hasu${i}`).checked;
-            let kagen = document.getElementById(`kagen${i}`).value !== "" ? parseInt(document.getElementById(`kagen${i}`).value) : null;
-            let jogen = document.getElementById(`jogen${i}`).value !== "" ? parseInt(document.getElementById(`jogen${i}`).value) : null;
-
-            // [名称, 薬価, シート数, 端数禁止フラグ, 上限, 下限, 元の番号]
-            inputList.push([name, yakka, josu, hasu, jogen, kagen, i]);
-          }
-        }
-
-        if (inputList.length === 0) {
-          alert("計算対象の薬剤にチェックを入れてください。");
-          return;
-        }
-
-        // 計算に必要なHTML構造をあらかじめ描画
-        document.getElementById('result_area').innerHTML = generateResultTableHeader();
-
-        // 旧Code.gsから移植した計算処理のキック
-        概算処理(mokuhyou, inputList);
-      }
-
-      function クリアボタン() {
-        if(confirm("入力を初期状態に戻しますか？")) {
-          reflectDataToForm(DEFAULT_DATA);
-          localStorage.setItem('tokakokan_data', JSON.stringify(DEFAULT_DATA));
-          document.getElementById('result_area').innerHTML = "";
-          document.getElementById('jouken_container').innerHTML = "";
-        }
-      }
-
-      function generateResultTableHeader() {
-        let html = `<table class="table table-striped table-bordered align-middle text-center" style="font-size: 13px;">`;
-        html += `<thead class="table-dark"><tr><th style="width:6%">順位</th><th style="width:12%">合計薬価</th><th style="width:10%">差額</th>`;
-        for (let l = 1; l <= 5; l++) {
-          html += `<th><span id="midasi_${l}">-</span></th>`;
-        }
-        html += `</tr></thead><tbody>`;
-        for (let rank = 1; rank <= 30; rank++) {
-          html += `<tr><td>${rank}</td><td><span id="goukei${rank}"></span></td><td><span id="sagaku${rank}"></span></td>`;
-          for (let l = 1; l <= 5; l++) {
-            html += `<td><span id="kekka${rank}_${l}"></span></td>`;
-          }
-          html += `</tr>`;
-        }
-        html += `</tbody></table>`;
-        html += `<div class="mt-2 fw-bold"><span id="yukousuu" style="color: red;"></span> <span id="sousuu"></span></div>`;
-        html += `<p id="siborikomijouken" class="text-muted small"></p>`;
-        return html;
-      }
-
-      // ============================================================
-      // 🧮 旧 Code.gs 側から移植したコアロジック群
-      // ============================================================
-      function 概算処理(mokuhyou, 元list) {
-        const list  = 元list.map(i => i[1]);
-        const list2 = 元list.map(i => i[2]);
-        const list4 = 元list.map(i => i[4]);
-
-        let 何通り = 1;
-        for (let j of list) {
-          何通り = 何通り * (mokuhyou * 10) / (j * 10);
-        }
-
-        let 基準値 = 10000000;
-        let 下限オフセット = [];
-        let 上限係数配列 = [];
-        let 条件タグ配列 = [];
-
-        for (let i = 0; i < 元list.length; i++) {
-          let item = 元list[i];
-          let kagen = item[5];
-          let jogen = item[4];
-          下限オフセット.push(kagen !== null ? kagen : 0);
-          上限係数配列.push({ idx: i, yakka: item[1], josu: item[2], jogen: jogen, kagen: kagen });
-        }
-
-        let 補正結果 = 基準値チェックと補正(mokuhyou, 上限係数配列, 下限オフセット, 基準値, list);
-        let 新たな目標値 = mokuhyou;
-        let 概算係数 = null;
-
-        if (補正結果 === false) {
-          document.getElementById('result_area').innerHTML = "<div class='alert alert-danger'>条件に合う組み合わせが存在しないか、計算範囲を超えています。</div>";
-          return;
-        } else if (Array.isArray(補正結果)) {
-          新たな目標値 = 補正結果[0];
-          概算係数 = 補正結果[1];
-        }
-
-        if (概算係数) {
-          for (let i = 0; i < 元list.length; i++) {
-            let item = 元list[i];
-            let gaisanKosu = 概算係数[i] * item[2];
-            let label = item[4] !== null ? "上限値" : "概算";
-            条件タグ配列.push(`<span class="jouken-tag ${item[4] !== null ? 'jouken-tag-danger' : 'jouken-tag-normal'}">${item[0]}: ${gaisanKosu}個固定 (${label})</span>`);
-          }
+        const first = getFirstCandidateValue(colNo);
+        if (first !== null) {
+          setVal(first);
         } else {
-          for (let i = 0; i < 元list.length; i++) {
-            let item = 元list[i];
-            if (item[5] !== null && item[5] > 0) {
-              条件タグ配列.push(`<span class="jouken-tag jouken-tag-normal">${item[0]}: 下限 ${item[5]*item[2]}個</span>`);
-            }
-          }
+          calcBtn();
+          setTimeout(() => {
+            const v = getFirstCandidateValue(colNo);
+            if (v !== null) setVal(v);
+          }, 200);
         }
-
-        let container = document.getElementById('jouken_container');
-        if (条件タグ配列.length > 0) {
-          container.innerHTML = `<div class="jouken-warn-box">⚠️ 組み合わせ数が膨大なため、以下の条件で探索を絞り込みました:<br>${条件タグ配列.join('')}</div>`;
-        } else {
-          container.innerHTML = "";
-        }
-
-        // 全通り計算を実行
-        全通り計算(新たな目標値, 元list, 概算係数, 下限オフセット);
       }
+      return;
+    }
 
-      function 全通り計算(mokuhyou, 元list, 概算係数, 下限オフセット) {
-        const siborikomi = parseFloat(document.getElementById('siborikomi').value) || 0;
-        let validRows = 元list;
+    const current = parseFloat(el.value) || 0;
 
-        for (let l = 1; l <= 5; l++) {
-          let midasiSpan = document.getElementById(`midasi_${l}`);
-          if (l <= validRows.length) {
-            midasiSpan.innerText = validRows[l - 1][0];
-          } else {
-            midasiSpan.innerText = "-";
+    if (step !== null && step < 1) {
+      const precision = 10;
+      const delta = scrollUp ? step : -step;
+      const next = Math.round((current + delta) * precision) / precision;
+      el.value = Math.max(0, next);
+      el.dispatchEvent(new Event('input'));
+      return;
+    }
+
+    const dynStep = getStep(current);
+    const next = scrollUp ? current + dynStep : current - dynStep;
+
+    if (allowInfinity && next < 0) {
+      el.value = "";
+      el.placeholder = "∞";
+      el.dispatchEvent(new Event('input'));
+    } else {
+      el.value = Math.max(0, next);
+      el.dispatchEvent(new Event('input'));
+    }
+  }, { passive: false });
+}
+
+addWheelHandler(document.getElementById('mokuhyou'), 0.1);
+addWheelHandler(document.getElementById('siborikomi'), 0.1);
+for (let i = 1; i <= 5; i++) {
+  addWheelHandler(document.getElementById('jogen' + i), 1, true, i);
+  addWheelHandler(document.getElementById('kagen' + i), 1, false, i);
+}
+
+document.getElementById('mokuhyou').addEventListener('input', (e) => calcBtn());
+document.getElementById('siborikomi').addEventListener('input', (e) => calcBtn());
+
+for (let k = 1; k <= 4; k++) {
+  let 対象="";
+  switch (k){
+    case 1:対象='yakka';break;
+    case 2:対象='josu';break;
+    case 3:対象='jogen';break;
+    case 4:対象='kagen';break;
+    default:
+  }
+  for (let i = 1; i <= 5; i++) {
+    const henkouId = 対象 + i;
+    const henkou = document.getElementById(henkouId);
+    if (henkou) {
+      henkou.addEventListener('input', calcBtn);
+    }
+  }
+}
+
+for (let k = 1; k <= 2; k++) {
+  let 対象チェックボックス="";
+  switch (k){
+    case 1:対象チェックボックス='yukou';break;
+    case 2:対象チェックボックス='hasuu';break;
+    default:
+  }
+  for (let i = 1; i <= 5; i++) {
+    const checkboxId = 対象チェックボックス + i;
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox) {
+      checkbox.addEventListener('change', calcBtn);
+    }
+  }
+}
+
+setteiBtn()
+
+//▼設定部分の表示・非表示▼
+function setteiBtn(){
+  for (var i = 1; i <= 4; i++) {
+    const row = document.getElementById("settei" + i);
+    row.classList.toggle('hidden');
+  }
+}
+
+function setteiOpen(){
+  for (var i = 1; i <= 4; i++) {
+    const row = document.getElementById("settei" + i);
+    row.classList.remove('hidden');
+  }
+}
+
+function updateJogenKagenHighlight(表示No, list) {
+  for (let i = 1; i <= 5; i++) {
+    const jEl = document.getElementById('jogen' + i);
+    const kEl = document.getElementById('kagen' + i);
+    if (jEl) jEl.classList.remove('input-highlight');
+    if (kEl) kEl.classList.remove('input-highlight');
+  }
+  表示No.forEach((rowNo, idx) => {
+    const jEl = document.getElementById('jogen' + rowNo);
+    const kEl = document.getElementById('kagen' + rowNo);
+    if (list[idx][4] !== null && jEl) jEl.classList.add('input-highlight');
+    if (list[idx][5] !== null && list[idx][5] > 0 && kEl) kEl.classList.add('input-highlight');
+  });
+}
+
+function highlightJogenKagen(表示No, list){
+  setteiOpen();
+  updateJogenKagenHighlight(表示No, list);
+  const first = document.getElementById('settei1');
+  if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+//▼計算する▼
+function calcBtn(){
+
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('mokuhyousa_' + i).innerHTML = "";
+    document.getElementById('hasuuzero_' + i).innerHTML = "";
+  }
+  for (let i = 1; i <= 5; i++) {
+    for (let j = 1; j <= 5; j++) {
+      const element = document.getElementById(`kekka${i}_${j}`);
+      if (element) {
+          element.innerHTML = "";
+      }
+    }
+  }
+  document.getElementById('siborikomijouken').innerHTML = "";
+  document.getElementById('yukousuu').innerHTML = "";
+  document.getElementById('sousuu').innerHTML = "";
+
+  function updateKagenMax() {
+    const mokuhyou = Number(document.getElementById('mokuhyou').value);
+    for (let i = 1; i <= 5; i++) {
+      const kagenEl = document.getElementById('kagen' + i);
+      const jogenEl = document.getElementById('jogen' + i);
+      const yakkaEl = document.getElementById('yakka' + i);
+      if (!kagenEl || !yakkaEl) continue;
+
+      const yakka = Number(yakkaEl.value);
+      if (!yakka || yakka <= 0) continue;
+
+      const maxByMokuhyou = mokuhyou > 0 ? Math.floor(mokuhyou / yakka) : 0;
+
+      const jogenVal = jogenEl.value !== "" ? Number(jogenEl.value) : null;
+      const maxByJogen = jogenVal !== null ? jogenVal : Infinity;
+
+      const finalMax = Math.min(maxByMokuhyou, maxByJogen);
+      kagenEl.max = finalMax;
+
+      if (kagenEl.value !== "" && Number(kagenEl.value) > finalMax) {
+        kagenEl.value = finalMax;
+      }
+    }
+  }
+  updateKagenMax();
+
+  const yukou1 = document.getElementById('yukou1').checked;
+  const yukou2 = document.getElementById('yukou2').checked;
+  const yukou3 = document.getElementById('yukou3').checked;
+  const yukou4 = document.getElementById('yukou4').checked;
+  const yukou5 = document.getElementById('yukou5').checked;
+
+  const mokuhyou = Number(document.getElementById('mokuhyou').value);
+  const siborikomi = Number(document.getElementById('siborikomi').value);
+
+  if (mokuhyou == ""){
+  }else{
+
+    let 目標10 = mokuhyou*10
+    let 絞り込み = siborikomi
+    let list = []
+    let cnt=0;
+    let 表示No=[]
+
+    for (let i = 1; i <= 5; i++) {
+      addToListIfChecked(i);
+    }
+    function addToListIfChecked(rowNum) {
+      const yukouChecked = document.getElementById('yukou' + rowNum).checked;
+      if (yukouChecked) {
+        if (document.getElementById('yakka' + rowNum).value == "" || document.getElementById('josu' + rowNum).value ==""){
+        }else{
+          list.push([]);
+          list[cnt][0] = document.getElementById('meisyou' + rowNum).value;
+          list[cnt][1] = Number(document.getElementById('yakka' + rowNum).value);
+          list[cnt][2] = Number(document.getElementById('josu' + rowNum).value);
+          list[cnt][3] = document.getElementById('hasuu' + rowNum).checked;
+          const jogenVal = document.getElementById('jogen' + rowNum).value;
+          const kagenVal = document.getElementById('kagen' + rowNum).value;
+          list[cnt][4] = jogenVal !== "" ? Number(jogenVal) : null;
+          list[cnt][5] = kagenVal !== "" ? Number(kagenVal) : null;
+          cnt++;
+          表示No.push(rowNum);
+        }
+      }
+    }
+
+    let array1 = []
+    let 概算係数 = []
+    let valuesX = []
+    for (let l = 0; l < list.length; l++) {
+      array1[l]=0
+      概算係数[l]=0
+    }
+
+    const 概算判定 = 概算処理(目標10,list)
+    if (概算判定 !== false) {
+      目標10 = 概算判定[0]
+      概算係数 = 概算判定[1]
+    }
+
+    let スキップ = false;
+    let 総数=0;
+    let 有効数=0;
+    let 戻り値="def";
+    let シートcnt=0;
+
+    while("内部で条件を判定") {
+      if (list.length >= 5) {
+        array1[3]=0
+        戻り値=終了判定(list,array1,目標10)
+      }
+      if (戻り値 == false) break;
+      while("内部で条件を判定") {
+        if (list.length >= 4) {
+          array1[2]=0
+          戻り値=終了判定(list,array1,目標10)
+        }
+        if (戻り値 == false) break;
+
+        while("内部で条件を判定") {
+          if (list.length >= 3) {
+            array1[1]=0
+            戻り値=終了判定(list,array1,目標10)
           }
-        }
+          if (戻り値 == false) break;
 
-        let list = [];
-        for (let i = 0; i < validRows.length; i++) {
-          let item = validRows[i];
-          let isFixed = 概算係数 && 概算係数[i] > 0;
-          list.push([item[0], item[1], item[2], item[3], item[4], item[5], isFixed]);
-        }
-
-        let array = new Array(list.length).fill(0);
-        let ans = [];
-        let 探索目標10 = Math.round(mokuhyou * 10);
-        let 総当たり数 = 0;
-
-        function sortUnitSales(a, b) {
-          if (a[0] !== b[0]) return a[0] - b[0];
-          if (a[1] !== b[1]) return b[1] - a[1];
-          return 0;
-        }
-
-        function 終了判定(list, array, 目標10) {
-          let 合計10 = 0;
-          for (let l = 1; l < list.length; l++) {
-            合計10 += array[l] * (list[l][1] * 10);
-          }
-          let 目標2 = 目標10 - 合計10;
-          if (目標2 < 0) return false;
-          return 個数(目標2, list[0][1] * 10);
-        }
-
-        function 個数(目標, 薬価) {
-          let cnt = 1;
-          while (目標 - 薬価 * cnt >= 0) cnt++;
-          let 判定値 = 目標 - 薬価 * (cnt - 1);
-          if (判定値 === 0) return cnt - 1;
-          return false;
-        }
-
-        if (list.length === 1) {
-          let singleYakka10 = Math.round(list[0][1] * 10);
-          let itemJosu = list[0][2];
-          let hasuKinsi = list[0][3];
-          let jogenSheet = list[0][4];
-          let kagenSheet = list[0][5];
-
-          let startSheet = kagenSheet !== null ? kagenSheet : 0;
-          let maxSheet = Math.floor(探索目標10 / (singleYakka10 * itemJosu)) + 5;
-          if (jogenSheet !== null) maxSheet = Math.min(maxSheet, jogenSheet);
-
-          for (let s = startSheet; s <= maxSheet; s++) {
-            let currentKosu = s * itemJosu;
-            let currentPrice10 = singleYakka10 * currentKosu;
-            let diff = Math.abs(currentPrice10 - 探索目標10) / 10;
-            if (diff <= siborikomi) {
-              ans.push([diff, currentKosu, [currentKosu]]);
-            }
-          }
-        } else {
-          // 多品目の総当たり
-          while (true) {
-            総当たり数++;
-            let flag = true;
-            for (let l = 1; l < list.length; l++) {
-              let itemYakka10 = Math.round(list[l][1] * 10);
-              let itemJosu = list[l][2];
-              let hasuKinsi = list[l][3];
-              let jogenSheet = list[l][4];
-              let kagenSheet = list[l][5];
-              let isFixed = list[l][6];
-
-              if (isFixed) {
-                if (array[l] < 概算係数[l]) {
-                  array[l] = 概算係数[l];
-                  break;
-                } else {
-                  array[l] = 0;
-                  if (l === list.length - 1) flag = false;
-                  continue;
-                }
-              }
-
-              let currentKosu = array[l] * itemJosu;
-              let checkPrice10 = itemYakka10 * currentKosu;
-
-              let offsetSheet = kagenSheet !== null ? kagenSheet : 0;
-              let nextKosu = (array[l] + 1 + offsetSheet) * itemJosu;
-              let nextPrice10 = itemYakka10 * nextKosu;
-
-              let overJogen = (jogenSheet !== null) && ((array[l] + 1 + offsetSheet) > jogenSheet);
-
-              if (探索目標10 - nextPrice10 >= 0 && !overJogen) {
-                array[l]++;
+          while("内部で条件を判定") {
+            if (list.length >= 2) {
+              シートcnt=0;
+              戻り値=終了判定(list,array1,目標10)
+              if (戻り値 == false) {
                 break;
-              } else {
-                array[l] = 0;
-                if (l === list.length - 1) flag = false;
-              }
-            }
+              }else{
+                array1[0]=戻り値[1]
 
-            if (!flag) break;
-
-            let result = 終了判定(list, array, 探索目標10);
-            if (result !== false) {
-              let lastIdx = 0;
-              let itemJosu0 = list[lastIdx][2];
-              let hasuKinsi0 = list[lastIdx][3];
-              let jogenSheet0 = list[lastIdx][4];
-              let kagenSheet0 = list[lastIdx][5];
-              let isFixed0 = list[lastIdx][6];
-
-              let totalSheet0 = result + (kagenSheet0 !== null ? kagenSheet0 : 0) + (概算係数 ? 概算係数[0] : 0);
-              let totalKosu0 = totalSheet0 * itemJosu0;
-
-              let valid0 = true;
-              if (jogenSheet0 !== null && totalSheet0 > jogenSheet0) valid0 = false;
-              if (hasuKinsi0 && (totalKosu0 % itemJosu0 !== 0)) valid0 = false;
-
-              if (valid0) {
-                let current_price10 = Math.round(list[lastIdx][1] * 10) * totalKosu0;
-                let current_cnt_array = [totalKosu0];
-
-                for (let m = 1; m < list.length; m++) {
-                  let off = 下限オフセット[m];
-                  let finalSheet = array[m] + off;
-                  current_price10 += Math.round(list[m][1] * 10) * (finalSheet * list[m][2]);
-                  current_cnt_array.push(finalSheet * list[m][2]);
+                if (戻り値[0]/10 <= 絞り込み){
+                  スキップ = false
+                  for (let k of 表示No) {
+                    if (document.getElementById('hasuu' + k).checked == true && array1[表示No.indexOf(k)] % list[表示No.indexOf(k)][2] !== 0){
+                      スキップ = true
+                    }
+                  }
+                  if (スキップ == false){
+                    array1[0]=戻り値[1]
+                    if (概算判定 !== false){
+                      for (let l = 0; l < 概算係数.length; l++) {
+                        array1[l] += 概算係数[l]*list[l][2]
+                      }
+                    }
+                    for (let l = 0; l < list.length; l++) {
+                      if (list[l][4] !== null && array1[l] > list[l][4]) { スキップ = true; break; }
+                      if (list[l][5] !== null && array1[l] < list[l][5]) { スキップ = true; break; }
+                    }
+                    if (スキップ == false){
+                      valuesX.push([...array1])
+                      for (let l = 0; l < list.length; l++) {
+                        if (array1[l]!==0 && array1[l] % list[l][2]==0) シートcnt++
+                      }
+                      valuesX[有効数].unshift(シートcnt)
+                      valuesX[有効数].unshift(戻り値[0]/10)
+                      有効数++
+                    }
+                    if (概算判定 !== false){
+                      for (let l = 0; l < 概算係数.length; l++) {
+                        array1[l] = array1[l] - 概算係数[l]*list[l][2]
+                      }
+                    }
+                  }
                 }
-
-                let diff = Math.abs(current_price10 - 探索目標10) / 10;
-                if (diff <= siborikomi) {
-                  ans.push([diff, current_price10 / 10, current_cnt_array]);
-                }
+                array1[1]++
+                総数++
               }
+            }else{
+              戻り値=終了判定(list,array1,目標10)
+              array1[0]=戻り値[1]
+              valuesX.push([...array1])
+              for (let l = 0; l < list.length; l++) {
+                if (array1[l]!==0 && array1[l] % list[l][2]==0) シートcnt++
+              }
+              valuesX[有効数].unshift(シートcnt)
+              valuesX[有効数].unshift(戻り値[0]/10)
+              有効数++
+              総数++
+              戻り値 = false
+              break;
             }
           }
+          array1[2]++
         }
-
-        ans.sort(sortUnitSales);
-
-        // 結果のDOM出力
-        let disp_cnt = Math.min(ans.length, 30);
-        for (let rank = 1; rank <= disp_cnt; rank++) {
-          let data = ans[rank - 1];
-          document.getElementById(`goukei${rank}`).innerText = data[1].toFixed(1);
-          document.getElementById(`sagaku${rank}`).innerText = (data[1] - mokuhyou).toFixed(1);
-
-          for (let l = 1; l <= 5; l++) {
-            let cell = document.getElementById(`kekka${rank}_${l}`);
-            if (l <= data[2].length) {
-              let kosu = data[2][l - 1];
-              let josu = list[l - 1][2];
-              cell.innerText = `${kosu}個 (${(kosu/josu).toFixed(1)}s)`;
-            } else {
-              cell.innerText = "-";
-            }
-          }
-        }
-
-        document.getElementById('yukousuu').innerText = `条件一致: ${ans.length}通り`;
-        document.getElementById('sousuu').innerText = `(総当たりループ数: ${総当たり数})`;
-        document.getElementById('siborikomijouken').innerText = `※目標：${mokuhyou}円 から ±${siborikomi}円 以内を表示しています。`;
+        array1[3]++
       }
+      array1[4]++
+    }
 
-      function 基準値チェックと補正(新たな目標値, 上限係数配列, 下限オフセット, 基準値, list) {
-        let 何通り = 1;
-        for (let j of list) {
-          何通り = 何通り * (新たな目標値 * 10) / (j * 10);
-        }
-        if (何通り <= 基準値) return null;
+    valuesX.sort(sortUnitSales)
 
-        let 概算係数 = new Array(list.length).fill(0);
-        let 完全終了 = false;
+    for (let i = 1; i <= 5; i++) {
+      const row = document.getElementById('kandidate_row_' + i);
+      if (row) {
+        row.classList.remove('row-flash');
+        void row.offsetWidth;
+        row.classList.add('row-flash');
+      }
+    }
 
-        上限係数配列.sort((a, b) => {
-          if (a.jogen !== null && b.jogen === null) return -1;
-          if (a.jogen === null && b.jogen !== null) return 1;
-          return b.yakka - a.yakka;
-        });
-
-        for (let item of 上限係数配列) {
-          let maxSheet = Math.floor((新たな目標値 * 10) / (item.yakka * 10 * item.josu));
-          if (item.jogen !== null) {
-            let 上限係数 = item.jogen - item.kagen;
-            if (上限係数 < 0) return false;
-            let 上限固定後目標 = 新たな目標値 - (item.yakka * item.josu * 上限係数);
-            if (上限固定後目標 > 0) {
-              新たな目標値 = 上限固定後目標;
-              概算係数[item.idx] = 上限係数;
-              let 残り何通り = 1;
-              for (let j of list) {
-                残り何通り = 残り何通り * (上限固定後目標 * 10) / (j * 10);
-              }
-              if (残り何通り <= 基準値) 完全終了 = true;
-            } else {
-              概算係数[item.idx] = 0;
-            }
+    for (let i = 0; i < 5; i++) {
+      updateMokuhyousaStyle(i);
+      updateHasuuzeroStyle(i);
+    }
+    function updateMokuhyousaStyle(index) {
+      if (valuesX[index]) {
+        const value = valuesX[index][0];
+        const element = document.getElementById('mokuhyousa_' + (index + 1));
+        if (element) {
+          element.innerHTML = value;
+          if (value === 0) {
+            element.style.fontWeight = 'bold';
+            element.style.backgroundColor = 'yellow';
           } else {
-            let 上限係数 = Math.max(0, maxSheet - 1);
-            let 上限固定後目標 = 新たな目標値 - (item.yakka * item.josu * 上限係数);
-            if (上限固定後目標 > 0) {
-              新たな目標値 = 上限固定後目標;
-              概算係数[item.idx] = 上限係数;
-              let 残り何通り = 1;
-              for (let j of list) {
-                残り何通り = 残り何通り * (上限固定後目標 * 10) / (j * 10);
-              }
-              if (残り何通り <= 基準値) 完全終了 = true;
-            } else {
-              概算係数[item.idx] = 0;
+            element.style.fontWeight = 'normal';
+            element.style.backgroundColor = 'transparent';
+          }
+        }
+      }
+    }
+
+    function updateHasuuzeroStyle(index) {
+      if (valuesX[index]) {
+        const value = valuesX[index][1];
+        const element = document.getElementById('hasuuzero_' + (index + 1));
+        if (element) {
+          element.innerHTML = value;
+          if (value !== 0) {
+            element.style.fontWeight = 'bold';
+            element.style.color = "blue";
+          } else {
+            element.style.fontWeight = 'normal';
+            element.style.color = "";
+          }
+        }
+      }
+    }
+
+    let 端数禁止="";
+    switch (true){
+      case yukou1 == true && document.getElementById('hasuu1').checked:端数禁止=" かつ端数禁止設定項目あり";break;
+      case yukou2 == true && document.getElementById('hasuu2').checked:端数禁止=" かつ端数禁止設定項目あり";break;
+      case yukou3 == true && document.getElementById('hasuu3').checked:端数禁止=" かつ端数禁止設定項目あり";break;
+      case yukou4 == true && document.getElementById('hasuu4').checked:端数禁止=" かつ端数禁止設定項目あり";break;
+      case yukou5 == true && document.getElementById('hasuu5').checked:端数禁止=" かつ端数禁止設定項目あり";break;
+      default:
+    }
+    let 上限適用 = list.some((l, i) => l[4] !== null);
+    let 下限適用 = list.some((l, i) => l[5] !== null && l[5] > 0);
+    const 結果ゼロ = 有効数 === 0;
+
+    function makeTag(label, isZero) {
+      const cls = isZero ? 'jouken-tag jouken-tag-danger' : 'jouken-tag jouken-tag-normal';
+      const icon = isZero ? '⚠ ' : '';
+      return `<span class="${cls}" onclick="setteiOpen(); highlightJogenKagen(${JSON.stringify(表示No)}, ${JSON.stringify(list.map(l=>[null,null,null,null,l[4],l[5]]))})">${icon}${label}</span>`;
+    }
+
+    let 上下限表示HTML = "";
+    if (上限適用) 上下限表示HTML += " かつ" + makeTag("上限値適用中", 結果ゼロ);
+    if (下限適用) 上下限表示HTML += " かつ" + makeTag("下限値適用中", 結果ゼロ);
+
+    let 絞り込み条件内容="";
+    let 警告ボックス = "";
+    if (list.length == 1){
+      絞り込み条件内容 += `※単一薬剤にて絞り込み設定を無効にしています`
+    }else{
+      if (絞り込み == 0){
+        絞り込み = "ぴったりのみ(少しのズレも許せない!)";
+      }else{
+        絞り込み = `許容差${絞り込み}円以内`;
+      }
+      絞り込み条件内容 += `※絞り込み内容:${絞り込み}${端数禁止}${上下限表示HTML}`
+      if (結果ゼロ && (上限適用 || 下限適用)) {
+        警告ボックス = `<div class="jouken-warn-box" style="cursor:pointer" onclick="setteiOpen(); updateJogenKagenHighlight(${JSON.stringify(表示No)}, ${JSON.stringify(list.map(l=>[null,null,null,null,l[4],l[5]]))}); document.getElementById('settei1').scrollIntoView({behavior:'smooth',block:'center'})">⚠ 結果が0件です。上限値・下限値の設定が厳しすぎる可能性があります。クリックすると該当の設定欄が表示されます。</div>`;
+      }
+    }
+    document.getElementById('siborikomijouken').innerHTML = 絞り込み条件内容 + 警告ボックス;
+    document.getElementById('siborikomijouken').style.color = "red";
+    updateJogenKagenHighlight(表示No, list);
+    document.getElementById('yukousuu').innerHTML = `絞り込み条件該当数:${有効数.toLocaleString()}`;
+    let 概算総数="組み合わせ総数"
+    if (概算判定 !== false) 概算総数="組み合わせ概算"
+    let 概算お断り="";
+    if (概算判定 !== false) 概算お断り="※表示速度を優先し、概算を適用しています"
+    document.getElementById('sousuu').innerHTML = `/ ${概算総数}:${総数.toLocaleString()} ${概算お断り}`;
+
+    for (let i = 1; i <= 5; i++) {
+      if (表示No.includes(i)) {
+        for (let j = 0; j < 5; j++) {
+          updateKekkaCell(j, i);
+        }
+      }
+    }
+    function updateKekkaCell(rankIndex, originalRowNo) {
+      if (valuesX[rankIndex]) {
+        const valueIndex = 表示No.indexOf(originalRowNo) + 2;
+        const value = valuesX[rankIndex][valueIndex];
+        const elementId = `kekka${rankIndex + 1}_${originalRowNo}`;
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.innerHTML = value;
+          const josu = list[表示No.indexOf(originalRowNo)][2];
+          const isBoldBlue = value !== 0 && value % josu === 0;
+          element.style.fontWeight = isBoldBlue ? 'bold' : 'normal';
+          element.style.color = isBoldBlue ? 'blue' : '';
+        }
+      }
+    }
+
+    // ▼ 旧: google.script.run.ログを残す(...) → ブラウザのlocalStorageへ保存 ▼
+    clearTimeout(window._saveTimer);
+    window._saveTimer = setTimeout(() => {
+      saveCurrentState(mokuhyou, siborikomi);
+    }, 500);
+  }
+}
+
+// 概算処理 — 上限値を考慮したハイブリッド型
+function 概算処理(mokuhyou10, 元list) {
+  const list  = 元list.map(i => i[1]);
+  const list2 = 元list.map(i => i[2]);
+  const list4 = 元list.map(i => i[4]);
+  const list5 = 元list.map(i => i[5]);
+
+  let 下限オフセット = new Array(list.length).fill(0);
+  let 調整済み目標 = mokuhyou10;
+  for (let i = 0; i < list.length; i++) {
+    if (list5[i] !== null && list5[i] > 0) {
+      const offset = Math.ceil(list5[i] / list2[i]);
+      下限オフセット[i] = offset;
+      調整済み目標 -= list[i] * 10 * offset * list2[i];
+    }
+  }
+
+  if (調整済み目標 <= 0) return false;
+
+  let 何通り = 1;
+  for (let j of list) {
+    何通り = 何通り * 調整済み目標 / (j * 10);
+  }
+  const 基準値 = 100000000;
+
+  if (何通り <= 基準値) {
+    if (下限オフセット.every(v => v === 0)) return false;
+    return [調整済み目標, 下限オフセット];
+  }
+
+  let 索引付き = list.map((v, i) => ({
+    idx: i,
+    yakka: v,
+    josu: list2[i],
+    jogen: list4[i]
+  }));
+  索引付き.sort((a, b) => b.yakka - a.yakka);
+
+  let 概算係数 = new Array(list.length).fill(0);
+  let 新たな目標値 = 調整済み目標;
+  let 完全終了 = false;
+
+  for (let item of 索引付き) {
+    let 終了判定する = false;
+    let 係数 = 1;
+    while (true) {
+      const 暫定目標値 = 新たな目標値 - (item.yakka * 10 * item.josu);
+      if (暫定目標値 <= 0) break;
+      何通り = 1;
+      for (let j of list) {
+        何通り = 何通り * 暫定目標値 / (j * 10);
+      }
+      if (何通り > 基準値) {
+        新たな目標値 = 暫定目標値;
+        概算係数[item.idx] = 係数;
+        係数++;
+      } else if (何通り > 基準値 / 10) {
+        新たな目標値 = 暫定目標値;
+        概算係数[item.idx] = 係数;
+        完全終了 = true;
+      } else {
+        終了判定する = true;
+      }
+      if (終了判定する || 完全終了) break;
+
+      if (item.jogen !== null && 係数 * item.josu > item.jogen) {
+        const 上限係数 = Math.floor(item.jogen / item.josu);
+        if (上限係数 > 0) {
+          新たな目標値 = 調整済み目標;
+          for (let l = 0; l < list.length; l++) {
+            if (l !== item.idx && 概算係数[l] > 0) {
+              新たな目標値 -= list[l] * 10 * list2[l] * 概算係数[l];
             }
           }
-          if (完全終了) break;
+          const 上限固定後目標 = 新たな目標値 - (item.yakka * 10 * item.josu * 上限係数);
+          if (上限固定後目標 > 0) {
+            新たな目標値 = 上限固定後目標;
+            概算係数[item.idx] = 上限係数;
+            let 残り何通り = 1;
+            for (let j of list) {
+              残り何通り = 残り何通り * 上限固定後目標 / (j * 10);
+            }
+            if (残り何通り <= 基準値) 完全終了 = true;
+          } else {
+            概算係数[item.idx] = 0;
+          }
         }
-
-        for (let i = 0; i < list.length; i++) {
-          概算係数[i] += 下限オフセット[i];
-        }
-
-        if (概算係数.every(v => v === 0)) return false;
-        return [新たな目標値, 概算係数];
+        break;
       }
-    </script>
-  </body>
+    }
+    if (完全終了) break;
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    概算係数[i] += 下限オフセット[i];
+  }
+
+  if (概算係数.every(v => v === 0)) return false;
+  return [新たな目標値, 概算係数];
+}
+
+function sortUnitSales(a, b){
+  if (a[0] > b[0]) {
+    return 1;
+  } else if(a[0] < b[0]){
+    return -1;
+  }else{
+    if (a[1] < b[1]) {
+      return 1;
+    } else if(a[1] > b[1]){
+      return -1;
+    }else{
+      return 0;
+    }
+  }
+};
+
+function 終了判定(list,array,目標10){
+  let 合計10=0;
+  for (let l = 1; l < list.length; l++) {
+    合計10 += array[l]*(list[l][1]*10)
+  }
+  let 目標2 = 目標10-合計10
+  if (目標2<0) {
+    return false;
+  }else{
+    return 個数(目標2,list[0][1]*10)
+  }
+}
+
+function 個数(目標,薬価){
+  if (目標 === 0) return [0, 0];
+  let cnt=1;
+  while(目標-薬価*cnt>0){
+    cnt++
+  }
+  return [Math.abs(目標-薬価*(cnt)),cnt];
+}
+
+// 初回表示時、保存済み(または初期)データを使ってすぐに計算結果を表示
+calcBtn();
+
+</script>
+</body>
 </html>
