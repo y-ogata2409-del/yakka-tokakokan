@@ -120,6 +120,7 @@ input[type=checkbox] {
 .eq-chip-mokuhyou input{width:110px;font-size:22px}
 .eq-chip-sibori input{width:45px;font-size:15px}
 .eq-settei-btn{padding:5px 16px;border:1px solid #2a6645;border-radius:20px;background:#fff;color:#2a6645;font-size:15px;cursor:pointer;white-space:nowrap}
+.eq-icon-btn{padding:5px 12px;font-size:16px;line-height:1.2}
 
 .jouken-tag {
   display: inline-block;
@@ -381,9 +382,9 @@ function buildFormHTML(data) {
       <span>円以内</span>
     </div>
     <button type="button" id="setteibtn" onclick="setteiBtn()" class="eq-settei-btn">詳細設定 ▾</button>
-    <button type="button" onclick="resetAll()" class="eq-settei-btn" title="目標薬価・絞り込み・薬剤の設定をすべて初期値に戻します">🔄 初期値に戻す</button>
-    <button type="button" onclick="exportData()" class="eq-settei-btn" title="現在の設定をファイルに保存します">⬇ エクスポート</button>
-    <button type="button" onclick="document.getElementById('importFileInput').click()" class="eq-settei-btn" title="バックアップファイルから設定を読み込みます">⬆ インポート</button>
+    <button type="button" onclick="resetAll()" class="eq-settei-btn eq-icon-btn" title="初期値に戻す（目標薬価・絞り込み・薬剤の設定をすべてリセットします）">🔄</button>
+    <button type="button" onclick="exportData()" class="eq-settei-btn eq-icon-btn" title="エクスポート（現在の設定をファイルに保存します）">⬇</button>
+    <button type="button" onclick="document.getElementById('importFileInput').click()" class="eq-settei-btn eq-icon-btn" title="インポート（バックアップファイルから設定を読み込みます）">⬆</button>
     <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="importDataFile(this)">
   </div>
   `;
